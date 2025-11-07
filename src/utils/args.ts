@@ -1,3 +1,6 @@
+import fs from "fs";
+import path from "path";
+
 function getArgs(): string[] {
   return process.argv.slice(2);
 }
@@ -17,6 +20,57 @@ function parseToken(): string {
   }
 
   return token;
+}
+
+function parseCookiePath(): string {
+  const args = getArgs();
+  let token = "";
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--cookiepath" && i + 1 < args.length) {
+      token = args[i + 1];
+      break;
+    } else if (args[i].startsWith("--cookiepath=")) {
+      token = args[i].split("=")[1];
+      break;
+    }
+  }
+
+  return token;
+}
+
+function parseCookie(): string {
+  // 首先检查命令行参数
+  const args = getArgs();
+  let cookie = "";
+
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--cookie" && i + 1 < args.length) {
+      cookie = args[i + 1];
+      break;
+    } else if (args[i].startsWith("--cookie=")) {
+      cookie = args[i].split("=")[1];
+      break;
+    }
+  }
+
+  // 如果命令行参数没有提供cookie，则尝试从文件读取
+  if (!cookie) {
+    try {
+      // 查找项目根目录下的.ipscookie.local文件
+      // const projectPath = '/Users/oceanking/Desktop/code' as string;
+      const cookiePath = parseCookiePath();
+      // const cookieFilePath = path.join(cookiePath, "ipscookie.txt");
+      if (fs.existsSync(cookiePath)) {
+        cookie = fs.readFileSync(cookiePath, "utf8").trim();
+      }
+    } catch (error) {
+      // 如果读取文件失败，保持cookie为空
+      console.warn("Warning: Failed to read .ipscookie.local file:", error);
+    }
+  }
+
+  return cookie;
 }
 
 function parseUrl(): string {
@@ -75,10 +129,14 @@ function parseNoRule(): boolean {
   return false;
 }
 
+const cookie = parseCookie();
+console.log('cookie:', cookie)
+
 export function parserArgs(): {
   token: string;
   baseUrl: string;
   rules: string[];
+  cookie: string;
   debug: boolean;
   noRule: boolean;
 } {
@@ -87,6 +145,8 @@ export function parserArgs(): {
   const rules = parseRules();
   const debug = parseDebug();
   const noRule = parseNoRule();
+  const cookie = parseCookie();
+
 
   return {
     token,
@@ -94,7 +154,8 @@ export function parserArgs(): {
     rules,
     debug,
     noRule,
+    cookie,
   };
 }
 
-export { parseToken, parseUrl, parseRules, parseDebug, parseNoRule, getArgs };
+export { parseToken, parseUrl, parseRules, parseDebug, parseNoRule, getArgs, parseCookie };

@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { parseToken, parseUrl, parseRules, parseNoRule } from "./args";
+import { parseToken, parseUrl, parseRules, parseNoRule, parseCookie } from "./args";
 import https from "https";
 
 axios.defaults.httpsAgent = new https.Agent({
@@ -17,12 +17,20 @@ export interface CodeResponse {
   [key: string]: any;
 }
 
-const getCommonHeader = () => ({
-  "Content-Type": "application/json",
-  Accept: "application/json",
-  "X-MG-UserAccessToken":
-    process.env.MG_MCP_TOKEN || process.env.MASTERGO_API_TOKEN || parseToken(),
-});
+const cookie = parseCookie();
+
+const getCommonHeader = () => {
+  const header:any = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+    "X-MG-UserAccessToken":
+      process.env.MG_MCP_TOKEN || process.env.MASTERGO_API_TOKEN || parseToken(),
+  }
+  if (cookie){
+    header["Cookie"] = 'ZYBIPSCAS=' + cookie;
+  }
+  return header;
+};
 
 const getBaseUrl = () => {
   const url = process.env.API_BASE_URL || parseUrl();
