@@ -35,6 +35,8 @@ npx @mastergo/magic-mcp --token=YOUR_TOKEN [--url=API_URL] [--rule=RULE_NAME] [-
 - `--token=YOUR_TOKEN` (必需): MasterGo API 认证令牌
 - `--url=API_URL` (可选): API 基础 URL，默认为 http://localhost:3000
 - `--rule=RULE_NAME` (可选): 添加要应用的设计规则，可多次使用
+- `--cookie=COOKIE_NAME=COOKIE_VALUE` (可选): 增加自定义cookie，给私有化部署使用
+- `--cookiepath=your/path/cookie.txt` (可选): 指定 cookie 文件路径，给私有化部署使用
 - `--debug` (可选): 启用调试模式，提供详细错误信息
 - `--no-rule` (可选): 禁用默认规则
 
